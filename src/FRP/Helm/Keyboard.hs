@@ -8,7 +8,6 @@ module FRP.Helm.Keyboard (
   arrows, wasd
 ) where
 
-import Control.Applicative
 import Data.List
 import Foreign hiding (shift)
 import Foreign.C.Types

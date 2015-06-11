@@ -19,8 +19,7 @@ module FRP.Helm.Signal(
   lift7,
   lift8
 ) where
-import Control.Applicative
-import Data.Traversable (sequenceA)
+import Control.Applicative (liftA, liftA2)
 import FRP.Elerea.Param hiding (Signal)
 import qualified FRP.Elerea.Param as Elerea (Signal)
 import FRP.Helm.Sample

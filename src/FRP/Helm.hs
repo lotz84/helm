@@ -15,7 +15,6 @@ module FRP.Helm (
   FRP.Helm.Signal.lift
 ) where
 
-import Control.Applicative
 import Control.Concurrent (threadDelay)
 import Control.Exception
 import Control.Monad (when)
@@ -23,6 +22,7 @@ import Control.Monad.IO.Class
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.State
 import Data.Bits
+import Data.Text (pack)
 import Data.Foldable (forM_)
 import Foreign.C.String
 import Foreign.Marshal.Alloc
@@ -88,10 +88,10 @@ startup (EngineConfig { .. }) = withCAString windowTitle $ \title -> do
 
   where
     (w, h) = windowDimensions
-    wflags = foldl (.|.) 0 $ [SDL.windowFlagShown] ++
-                             [SDL.windowFlagResizable | windowIsResizable] ++
-                             [SDL.windowFlagFullscreen | windowIsFullscreen]
-    rflags = (.|.) SDL.rendererFlagPresentVSync SDL.rendererFlagAccelerated
+    wflags = foldl (.|.) 0 $ [SDL.SDL_WINDOW_SHOWN] ++
+                             [SDL.SDL_WINDOW_RESIZABLE | windowIsResizable] ++
+                             [SDL.SDL_WINDOW_FULLSCREEN_DESKTOP | windowIsFullscreen]
+    rflags = (.|.) SDL.SDL_RENDERER_PRESENTVSYNC SDL.SDL_RENDERER_ACCELERATED
 
 {-| Initializes and runs the game engine. The supplied signal generator is
     constantly sampled for an element to render until the user quits.
@@ -128,7 +128,7 @@ exposed = Signal getExposed
         event <- peek eventptr
 
         case event of
-          SDL.WindowEvent _ _ _ e _ _ -> return $ if e == SDL.windowEventExposed
+          SDL.WindowEvent _ _ _ e _ _ -> return $ if e == SDL.SDL_WINDOWEVENT_EXPOSED
                                                   then Changed ()
                                                   else Unchanged ()
           _ -> return $ Unchanged ()
@@ -170,7 +170,7 @@ render engine@(Engine { .. }) element (w, h) = alloca $ \pixelsptr ->
               (fromBE32 0x00ff0000) (fromBE32 0xff000000) (fromBE32 0x000000ff)
 
   texture <- SDL.createTexture renderer format
-               SDL.textureAccessStreaming (fromIntegral w) (fromIntegral h)
+               SDL.SDL_TEXTUREACCESS_STREAMING (fromIntegral w) (fromIntegral h)
 
   SDL.lockTexture texture nullPtr pixelsptr pitchptr
 
@@ -264,7 +264,7 @@ renderElement (TextElement (Text { textColor = (Color r g b a), .. })) = do
     layout <- lift $ Pango.createLayout textUTF8
 
     Cairo.liftIO $ Pango.layoutSetAttributes layout
-      [ Pango.AttrFamily { paStart = i, paEnd = j, paFamily = textTypeface }
+      [ Pango.AttrFamily { paStart = i, paEnd = j, paFamily = pack textTypeface }
       , Pango.AttrWeight { paStart = i, paEnd = j, paWeight = mapFontWeight textWeight }
       , Pango.AttrStyle  { paStart = i, paEnd = j, paStyle = mapFontStyle textStyle }
       , Pango.AttrSize   { paStart = i, paEnd = j, paSize = textHeight }

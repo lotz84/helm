@@ -7,7 +7,6 @@ module FRP.Helm.Window (
   position
 ) where
 
-import Control.Applicative (pure)
 import Foreign.Marshal.Alloc
 import Foreign.Storable
 import FRP.Elerea.Param hiding (Signal)
@@ -23,12 +22,12 @@ dimensions =
   where
     getDimensions = effectful1 action
     action engine = alloca $ \wptr -> alloca $ \hptr -> do
-	  SDL.getWindowSize (window engine) wptr hptr
+      SDL.getWindowSize (window engine) wptr hptr
 
-	  w <- peek wptr
-	  h <- peek hptr
+      w <- peek wptr
+      h <- peek hptr
 
-	  return (fromIntegral w, fromIntegral h)
+      return (fromIntegral w, fromIntegral h)
 
 {-| The current position of the window. -}
 position :: Signal (Int, Int)
@@ -37,12 +36,12 @@ position =
   where
     getPosition = effectful1 action
     action engine = alloca $ \xptr -> alloca $ \yptr -> do
-	  SDL.getWindowPosition (window engine) xptr yptr
+      SDL.getWindowPosition (window engine) xptr yptr
 
-	  x <- peek xptr
-	  y <- peek yptr
+      x <- peek xptr
+      y <- peek yptr
 
-	  return (fromIntegral x, fromIntegral y)
+      return (fromIntegral x, fromIntegral y)
 
 {-| The current width of the window. -}
 width :: Signal Int

@@ -11,7 +11,6 @@ module FRP.Helm.Mouse
   clicks
 ) where
 
-import Control.Applicative (pure)
 import Data.Bits
 import Foreign.Marshal.Alloc
 import Foreign.Ptr
